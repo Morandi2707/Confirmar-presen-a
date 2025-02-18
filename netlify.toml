@@ -1,7 +1,9 @@
 # netlify.toml
 [build]
   # Define o diretório de construção da aplicação React
-  publish = "build"
+  command = "npm run build" # Ou seu comando de build
+  functions = "google-sheets-api"   # Pasta onde as funções serverless estão
+  publish = "public"        # Pasta de arquivos estáticos (se aplicável)
   
   # Define o comando para a construção da aplicação React
   command = "npm run build"
