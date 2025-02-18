@@ -1,13 +1,17 @@
 [build]
-  command = "npm run build"  # Only one "command" allowed here
-  publish = "public"         # React/Vite build output folder
-  functions = "google-sheets-api"  # Serverless functions directory
+  command = "npm install && cd google-sheets-api && npm install && npm run build"
+  publish = "public"
+  functions = "google-sheets-api"
 
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"  # Redirect to Netlify Functions
   status = 200
 
+[[plugins]]
+package = "@netlify/plugin-functions-install-core"
+
 # Environment variables (set via Netlify UI instead!)
 [build.environment]
   NODE_VERSION = "18"  # Example Node.js version
+
