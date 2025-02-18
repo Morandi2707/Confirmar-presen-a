@@ -1,5 +1,5 @@
 [build]
-  command = "npm install && cd google-sheets-api && npm install && npm run build"
+  command = "npm install && npm run build" # Explicitly install dependencies first
   publish = "public"
   functions = "google-sheets-api"
 
