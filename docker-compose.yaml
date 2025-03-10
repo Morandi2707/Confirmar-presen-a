@@ -1,0 +1,29 @@
+version: '3'
+services:
+  server:
+    build:
+      context: ./google-sheets-api  # Diretório do backend
+      dockerfile: Dockerfile  # Nome do Dockerfile do backend
+    ports:
+      - "5000:5000"  # Mapeia a porta 5000 do container para 5000 no host
+    env_file:
+      - .env  # Arquivo de variáveis de ambiente (caminho relativo ao contexto do backend)
+    networks:
+      - my-network
+    restart: unless-stopped  # Reinicia automaticamente em caso de falha
+
+  client:
+    build:
+      context: .  # Diretório do frontend
+      dockerfile: Dockerfile  # Nome do Dockerfile do frontend
+    ports:
+      - "8065:80"  # Mapeia a porta 80 do container para 8065 no host
+    networks:
+      - my-network
+    depends_on:
+      - server  # Garante que o backend inicie antes do frontend
+    restart: unless-stopped  # Reinicia automaticamente em caso de falha
+
+networks:
+  my-network:
+    driver: bridge

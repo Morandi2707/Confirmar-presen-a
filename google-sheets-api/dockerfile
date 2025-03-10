@@ -1,0 +1,20 @@
+# Usa a imagem oficial do Node.js versão 18 com Alpine (leve)
+FROM node:18-alpine
+
+# Define o diretório de trabalho dentro do container
+WORKDIR /app
+
+# Copia os arquivos de dependências primeiro para aproveitar o cache de camadas
+COPY package*.json ./
+
+# Instala as dependências do projeto
+RUN npm install --omit=dev
+
+# Copia todos os arquivos do projeto para o container
+COPY . .
+
+# Expõe a porta definida na aplicação (5000 por padrão)
+EXPOSE 5000
+
+# Comando para iniciar a aplicação
+CMD ["node", "server.js"]

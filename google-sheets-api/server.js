@@ -7,6 +7,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Configuração das credenciais do Google
 const credentials = {
   type: process.env.GOOGLE_TYPE,
   project_id: process.env.GOOGLE_PROJECT_ID,
@@ -28,19 +29,22 @@ const auth = new google.auth.GoogleAuth({
 const sheets = google.sheets({ version: "v4", auth });
 const SPREADSHEET_ID = process.env.SHEET_ID;
 
-// Endpoint GET corrigido
+// Endpoint GET para obter todos os convidados (ignora o cabeçalho)
 app.get("/guests", async (req, res) => {
   try {
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: "Planilha1!A1", // Pega todas as colunas
+      range: "Planilha1!A:C", // Pega as colunas A, B e C
     });
 
     const rows = response.data.values;
-    if (!rows || rows.length === 0) return res.json([]);
+    if (!rows || rows.length === 0) {
+      return res.json([]);
+    }
     
+    // Ignora a primeira linha (cabeçalho) e mapeia os dados
     const guests = rows.slice(1).map((row, index) => ({
-      id: index + 1, // ID baseado na posição da linha
+      id: index + 1, // ID baseado na posição da linha (considerando que a linha 0 é o cabeçalho)
       Nome: row[0],
       Email: row[1],
       Convidado: parseInt(row[2]) || 0,
@@ -53,10 +57,34 @@ app.get("/guests", async (req, res) => {
   }
 });
 
-// Endpoint DELETE corrigido
+// Endpoint POST para inserir um novo convidado
+app.post("/guests", async (req, res) => {
+  try {
+    const { name, email, guests } = req.body;
+    // Insere os dados na planilha na ordem: Nome, Email, Convidado
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: SPREADSHEET_ID,
+      range: "Planilha1!A:C",
+      valueInputOption: "RAW",
+      insertDataOption: "INSERT_ROWS",
+      resource: {
+        values: [
+          [name, email, guests]
+        ]
+      }
+    });
+    res.status(201).json({ success: true });
+  } catch (error) {
+    console.error("Erro ao inserir convidado:", error);
+    res.status(500).json({ error: "Erro ao inserir dados" });
+  }
+});
+
+// Endpoint DELETE para remover um convidado
+// Utiliza o "id" enviado pelo front, que corresponde ao índice da linha (considerando o cabeçalho)
 app.delete("/guests/:id", async (req, res) => {
   try {
-    const rowIndex = parseInt(req.params.id); // ID já vem correto do front
+    const rowIndex = parseInt(req.params.id);
     await sheets.spreadsheets.batchUpdate({
       spreadsheetId: SPREADSHEET_ID,
       resource: {
@@ -64,9 +92,9 @@ app.delete("/guests/:id", async (req, res) => {
           {
             deleteDimension: {
               range: {
-                sheetId: 0,
+                sheetId: 0, // ID da aba (verifique se sua planilha possui a aba com ID 0)
                 dimension: "ROWS",
-                startIndex: rowIndex, // Já considera o cabeçalho
+                startIndex: rowIndex, // Linha a ser removida (considerando que a primeira linha é o cabeçalho)
                 endIndex: rowIndex + 1,
               },
             },
@@ -81,8 +109,6 @@ app.delete("/guests/:id", async (req, res) => {
   }
 });
 
-// Restante do código permanece igual...
-// (Endpoints POST e login sem alterações)
-
+// Inicializa o servidor
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));

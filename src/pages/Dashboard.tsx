@@ -90,15 +90,15 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div className="flex items-center space-x-2">
               <Calendar className="w-5 h-5 text-[#F7CF05]" />
-              <span>15 de Junho de 2024</span>
+              <span>20 de Março de 2025</span>
             </div>
             <div className="flex items-center space-x-2">
               <MapPin className="w-5 h-5 text-[#F7CF05]" />
-              <span>Salão de Festas Elegance</span>
+              <span>Rua Natal 1 - S/N Portal de Jacaraípe</span>
             </div>
             <div className="flex items-center space-x-2">
               <Clock className="w-5 h-5 text-[#F7CF05]" />
-              <span>19:00h</span>
+              <span>A partir das 15:00</span>
             </div>
           </div>
         </div>

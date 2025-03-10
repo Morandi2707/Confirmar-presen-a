@@ -1,0 +1,8 @@
+version: '3'
+services:
+  web:
+    image: meu-site-vite
+    build: .
+    ports:
+      - "8069:80"
+    restart: unless-stopped
