@@ -29,6 +29,11 @@ const auth = new google.auth.GoogleAuth({
 const sheets = google.sheets({ version: "v4", auth });
 const SPREADSHEET_ID = process.env.SHEET_ID;
 
+// Rota raiz para evitar o erro "Cannot GET /"
+app.get("/", (req, res) => {
+  res.send("Bem-vindo à API de Convidados!");
+});
+
 // Endpoint GET para obter todos os convidados (ignora o cabeçalho)
 app.get("/guests", async (req, res) => {
   try {
@@ -41,7 +46,7 @@ app.get("/guests", async (req, res) => {
     if (!rows || rows.length === 0) {
       return res.json([]);
     }
-    
+
     // Ignora a primeira linha (cabeçalho) e mapeia os dados
     const guests = rows.slice(1).map((row, index) => ({
       id: index + 1, // ID baseado na posição da linha (considerando que a linha 0 é o cabeçalho)
@@ -68,10 +73,8 @@ app.post("/guests", async (req, res) => {
       valueInputOption: "RAW",
       insertDataOption: "INSERT_ROWS",
       resource: {
-        values: [
-          [name, email, guests]
-        ]
-      }
+        values: [[name, email, guests]],
+      },
     });
     res.status(201).json({ success: true });
   } catch (error) {
