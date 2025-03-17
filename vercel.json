@@ -6,14 +6,14 @@
         "use": "@vercel/static"
       },
       {
-        "src": "google-sheets-api/api/**/*.ts",
+        "src": "google-sheets-api/server.js",
         "use": "@vercel/node"
       }
     ],
     "routes": [
       {
         "src": "/api/(.*)",
-        "dest": "google-sheets-api/$1.js"
+        "dest": "google-sheets-api/server.js"
       },
       {
         "src": "/(.*)",
